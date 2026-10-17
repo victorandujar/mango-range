@@ -1,5 +1,5 @@
 import { clamp } from "@/utils/math";
-import { PERCENT_LIMITS } from "../constants";
+import { EMPTY_TRACK_WIDTH, PERCENT_LIMITS } from "../constants";
 
 type TrackBounds = Pick<DOMRect, "left" | "width">;
 
@@ -13,7 +13,7 @@ export const percentToValue = (percent: number, min: number, max: number): numbe
   min + (percent / PERCENT_LIMITS.max) * (max - min);
 
 export const pointerToPercent = (clientX: number, { left, width }: TrackBounds): number => {
-  if (width <= 0) return PERCENT_LIMITS.min;
+  if (width <= EMPTY_TRACK_WIDTH) return PERCENT_LIMITS.min;
 
   return clampPercent(((clientX - left) / width) * PERCENT_LIMITS.max);
 };
