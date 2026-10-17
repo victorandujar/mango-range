@@ -7,8 +7,13 @@ export type Thumb = keyof Interval;
 
 export type FormatValue = (value: number) => string;
 
+export interface RangeFormat {
+  locale: string;
+  options?: Intl.NumberFormatOptions;
+}
+
 interface BaseRangeProps {
-  formatValue?: FormatValue;
+  format?: RangeFormat;
 }
 
 export interface NormalRangeProps extends BaseRangeProps {
@@ -32,4 +37,10 @@ export interface RangeModel {
   step: number;
   toValue: (position: number) => number;
   isEditable: boolean;
+}
+
+export interface ThumbView {
+  value: number;
+  text: string;
+  limits: Interval;
 }

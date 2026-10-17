@@ -67,3 +67,5 @@ export const LABEL_ALIGNMENT_CLASSES = {
   min: "text-right",
   max: "text-left",
 } as const;
+
+export const RANGE_THUMBS = [THUMBS.min, THUMBS.max] as const;
