@@ -15,6 +15,7 @@ interface UseRangeOptions {
 
 export const useRange = ({ bounds, step }: UseRangeOptions) => {
   const trackRef = useRef<HTMLDivElement>(null);
+  const isResolvingDragRef = useRef(false);
   const [activeThumb, setActiveThumb] = useState<Thumb | null>(null);
   const { selection, setThumbValue } = useRangeSelection({ bounds, step });
 
@@ -25,11 +26,22 @@ export const useRange = ({ bounds, step }: UseRangeOptions) => {
 
   const { draggingThumb, getDragHandlers } = useThumbDrag({
     trackRef,
-    onDragStart: setActiveThumb,
+    onDragStart: (thumb) => {
+      isResolvingDragRef.current = selection.min === selection.max;
+      setActiveThumb(thumb);
+    },
     onDrag: (thumb, percent) => {
       const value = percentToValue(percent, bounds.min, bounds.max);
+      const draggedThumb = activeThumb ?? thumb;
+      const targetThumb = isResolvingDragRef.current
+        ? resolveDragThumb(draggedThumb, value, selection)
+        : draggedThumb;
 
-      moveThumb(resolveDragThumb(activeThumb ?? thumb, value, selection), value);
+      if (value !== selection[draggedThumb]) {
+        isResolvingDragRef.current = false;
+      }
+
+      moveThumb(targetThumb, value);
     },
   });
 
