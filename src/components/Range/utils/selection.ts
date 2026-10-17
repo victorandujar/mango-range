@@ -26,3 +26,11 @@ export const updateSelection = (
   ...selection,
   [thumb]: constrainThumbValue(thumb, value, selection, bounds),
 });
+
+export const resolveDragThumb = (thumb: Thumb, value: number, selection: Interval): Thumb => {
+  if (selection.min !== selection.max) return thumb;
+  if (value < selection.min) return "min";
+  if (value > selection.max) return "max";
+
+  return thumb;
+};

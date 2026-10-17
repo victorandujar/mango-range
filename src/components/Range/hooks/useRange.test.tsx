@@ -16,7 +16,7 @@ interface RangeTestTrackProps {
 }
 
 const RangeTestTrack = ({ bounds, step }: RangeTestTrackProps) => {
-  const { trackRef, selection, percents, draggingThumb, getThumbProps } = useRange({
+  const { trackRef, selection, percents, draggingThumb, topThumb, getThumbProps } = useRange({
     bounds,
     step,
   });
@@ -25,6 +25,7 @@ const RangeTestTrack = ({ bounds, step }: RangeTestTrackProps) => {
     { label: TEST_OUTPUT_LABELS.selection, value: `${selection.min}-${selection.max}` },
     { label: TEST_OUTPUT_LABELS.positions, value: `${percents.min}%-${percents.max}%` },
     { label: TEST_OUTPUT_LABELS.draggingThumb, value: draggingThumb ?? NO_DRAGGING_THUMB },
+    { label: TEST_OUTPUT_LABELS.topThumb, value: topThumb },
   ];
 
   return (
@@ -57,6 +58,7 @@ const renderRange = (bounds: Interval, step = 1) => {
 const getSelection = () => readTestOutput("selection");
 const getPositions = () => readTestOutput("positions");
 const getDraggingThumb = () => readTestOutput("draggingThumb");
+const getTopThumb = () => readTestOutput("topThumb");
 
 describe("Given the useRange hook for a range from 1 to 101 on a track 200px wide", () => {
   const bounds = { min: 1, max: 101 };
@@ -168,6 +170,75 @@ describe("Given the useRange hook for a range from 1 to 101 on a track 200px wid
       const isNotPrevented = fireEvent.keyDown(minThumb, { key: "Tab" });
 
       expect(isNotPrevented).toBe(true);
+    });
+  });
+});
+
+describe("Given the useRange hook for a range from 1 to 101 where the thumbs overlap", () => {
+  const bounds = { min: 1, max: 101 };
+
+  describe("When it is rendered for the first time", () => {
+    it("Then the max thumb should be on top", () => {
+      renderRange(bounds);
+
+      expect(getTopThumb()).toBe("max");
+    });
+  });
+
+  describe("When the min thumb is dragged to the end of the track, over the max thumb", () => {
+    it("Then the min thumb should be on top, so it can still be dragged back", () => {
+      const { minThumb, dragThumb } = renderRange(bounds);
+
+      dragThumb(minThumb, 200);
+
+      expect(getSelection()).toBe("101-101");
+      expect(getTopThumb()).toBe("min");
+    });
+  });
+
+  describe("When a key moves the min thumb", () => {
+    it("Then the min thumb should be on top", () => {
+      const { minThumb } = renderRange(bounds);
+
+      fireEvent.keyDown(minThumb, { key: "ArrowRight" });
+
+      expect(getTopThumb()).toBe("min");
+    });
+  });
+
+  describe("When both thumbs are collapsed at 51 and the max thumb is dragged backward, to 20px and then to 40px", () => {
+    it("Then the min thumb should move with the pointer during the whole drag, ending at 21", () => {
+      const { minThumb, maxThumb, dragThumb } = renderRange(bounds);
+
+      dragThumb(minThumb, 100);
+      dragThumb(maxThumb, 100);
+      fireEvent.pointerDown(maxThumb, { pointerId: 1 });
+      fireEvent.pointerMove(maxThumb, { pointerId: 1, clientX: 20 });
+      fireEvent.pointerMove(maxThumb, { pointerId: 1, clientX: 40 });
+
+      expect(getSelection()).toBe("21-51");
+    });
+
+    it("Then the min thumb should be on top", () => {
+      const { minThumb, maxThumb, dragThumb } = renderRange(bounds);
+
+      dragThumb(minThumb, 100);
+      dragThumb(maxThumb, 100);
+      dragThumb(maxThumb, 20);
+
+      expect(getTopThumb()).toBe("min");
+    });
+  });
+
+  describe("When both thumbs are collapsed at 51 and the min thumb is dragged forward, to 160px", () => {
+    it("Then the max thumb should move with the pointer, ending at 81", () => {
+      const { minThumb, maxThumb, dragThumb } = renderRange(bounds);
+
+      dragThumb(minThumb, 100);
+      dragThumb(maxThumb, 100);
+      dragThumb(minThumb, 160);
+
+      expect(getSelection()).toBe("51-81");
     });
   });
 });

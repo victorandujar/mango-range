@@ -12,12 +12,13 @@ import type { Thumb } from "../types";
 import { useThumbDrag } from "./useThumbDrag";
 
 interface DragTestTrackProps {
+  onDragStart: (thumb: Thumb) => void;
   onDrag: (thumb: Thumb, percent: number) => void;
 }
 
-const DragTestTrack = ({ onDrag }: DragTestTrackProps) => {
+const DragTestTrack = ({ onDragStart, onDrag }: DragTestTrackProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
-  const { draggingThumb, getDragHandlers } = useThumbDrag({ trackRef, onDrag });
+  const { draggingThumb, getDragHandlers } = useThumbDrag({ trackRef, onDragStart, onDrag });
 
   return (
     <div ref={trackRef} data-testid={TEST_TRACK_ID}>
@@ -32,12 +33,14 @@ const DragTestTrack = ({ onDrag }: DragTestTrackProps) => {
 };
 
 const renderTrack = () => {
+  const onDragStart = jest.fn();
   const onDrag = jest.fn();
 
-  render(<DragTestTrack onDrag={onDrag} />);
+  render(<DragTestTrack onDragStart={onDragStart} onDrag={onDrag} />);
   mockTrackBounds({ left: 100, width: 200 });
 
   return {
+    onDragStart,
     onDrag,
     minThumb: getTestThumb("min"),
     maxThumb: getTestThumb("max"),
@@ -53,6 +56,14 @@ describe("Given a track 200px wide, starting at 100px, with a min and a max thum
       fireEvent.pointerDown(minThumb, { pointerId: 1 });
 
       expect(draggingThumb()).toBe("min");
+    });
+
+    it("Then it should report the start of a drag of the min thumb", () => {
+      const { minThumb, onDragStart } = renderTrack();
+
+      fireEvent.pointerDown(minThumb, { pointerId: 1 });
+
+      expect(onDragStart).toHaveBeenCalledWith("min");
     });
 
     it("Then the min thumb should receive the focus", () => {
@@ -147,6 +158,14 @@ describe("Given a track 200px wide, starting at 100px, with a min and a max thum
       fireEvent.pointerDown(minThumb, { pointerId: 1, button: 2 });
 
       expect(draggingThumb()).toBe(NO_DRAGGING_THUMB);
+    });
+
+    it("Then it should not report the start of a drag", () => {
+      const { minThumb, onDragStart } = renderTrack();
+
+      fireEvent.pointerDown(minThumb, { pointerId: 1, button: 2 });
+
+      expect(onDragStart).not.toHaveBeenCalled();
     });
   });
 });

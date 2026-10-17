@@ -18,3 +18,5 @@ export const KEYBOARD_BOUNDARY_KEYS = {
 } as const;
 
 export const PRIMARY_POINTER_BUTTON = 0;
+
+export const DEFAULT_TOP_THUMB = "max";
