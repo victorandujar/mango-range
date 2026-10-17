@@ -1,3 +1,4 @@
+import { ERROR_MESSAGES } from "@/constants/messages";
 import { fixedRangeMock, normalRangeMock } from "@/mocks/range";
 import { getFixedRange, getNormalRange } from "./rangeService";
 
@@ -18,7 +19,7 @@ describe("getNormalRange", () => {
   it("rejects when the source data is invalid", async () => {
     jest.replaceProperty(normalRangeMock, "min", 100);
 
-    await expect(getNormalRange()).rejects.toThrow("Invalid normal range data");
+    await expect(getNormalRange()).rejects.toThrow(ERROR_MESSAGES.invalidNormalRange);
   });
 });
 
@@ -32,6 +33,6 @@ describe("getFixedRange", () => {
   it("rejects when the source data is invalid", async () => {
     jest.replaceProperty(fixedRangeMock, "rangeValues", [5.99, 1.99]);
 
-    await expect(getFixedRange()).rejects.toThrow("Invalid fixed range data");
+    await expect(getFixedRange()).rejects.toThrow(ERROR_MESSAGES.invalidFixedRange);
   });
 });
