@@ -1,5 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { useRef } from "react";
+import {
+  NO_DRAGGING_THUMB,
+  TEST_OUTPUT_LABELS,
+  TEST_THUMB_LABELS,
+  TEST_THUMBS,
+  TEST_TRACK_ID,
+} from "../testing/rangeTestConfig";
+import { getTestThumb, mockTrackBounds, readTestOutput } from "../testing/rangeTestUtils";
 import type { Thumb } from "../types";
 import { useThumbDrag } from "./useThumbDrag";
 
@@ -12,10 +20,13 @@ const DragTestTrack = ({ onDrag }: DragTestTrackProps) => {
   const { draggingThumb, getDragHandlers } = useThumbDrag({ trackRef, onDrag });
 
   return (
-    <div ref={trackRef} data-testid="track">
-      <button aria-label="Minimum value" {...getDragHandlers("min")} />
-      <button aria-label="Maximum value" {...getDragHandlers("max")} />
-      <output aria-label="Dragging thumb">{draggingThumb ?? "none"}</output>
+    <div ref={trackRef} data-testid={TEST_TRACK_ID}>
+      {TEST_THUMBS.map((thumb) => (
+        <button key={thumb} aria-label={TEST_THUMB_LABELS[thumb]} {...getDragHandlers(thumb)} />
+      ))}
+      <output aria-label={TEST_OUTPUT_LABELS.draggingThumb}>
+        {draggingThumb ?? NO_DRAGGING_THUMB}
+      </output>
     </div>
   );
 };
@@ -24,16 +35,13 @@ const renderTrack = () => {
   const onDrag = jest.fn();
 
   render(<DragTestTrack onDrag={onDrag} />);
-
-  jest
-    .spyOn(screen.getByTestId("track"), "getBoundingClientRect")
-    .mockReturnValue({ left: 100, width: 200 } as DOMRect);
+  mockTrackBounds({ left: 100, width: 200 });
 
   return {
     onDrag,
-    minThumb: screen.getByRole("button", { name: "Minimum value" }),
-    maxThumb: screen.getByRole("button", { name: "Maximum value" }),
-    draggingThumb: () => screen.getByLabelText("Dragging thumb").textContent,
+    minThumb: getTestThumb("min"),
+    maxThumb: getTestThumb("max"),
+    draggingThumb: () => readTestOutput("draggingThumb"),
   };
 };
 
@@ -118,7 +126,7 @@ describe("Given a track 200px wide, starting at 100px, with a min and a max thum
       fireEvent.pointerDown(minThumb, { pointerId: 1 });
       endPointer(minThumb, { pointerId: 1 });
 
-      expect(draggingThumb()).toBe("none");
+      expect(draggingThumb()).toBe(NO_DRAGGING_THUMB);
     });
 
     it("Then further pointer moves should not report any drag", () => {
@@ -138,7 +146,7 @@ describe("Given a track 200px wide, starting at 100px, with a min and a max thum
 
       fireEvent.pointerDown(minThumb, { pointerId: 1, button: 2 });
 
-      expect(draggingThumb()).toBe("none");
+      expect(draggingThumb()).toBe(NO_DRAGGING_THUMB);
     });
   });
 });

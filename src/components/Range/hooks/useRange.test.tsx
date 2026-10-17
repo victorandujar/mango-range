@@ -1,4 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
+import {
+  NO_DRAGGING_THUMB,
+  TEST_OUTPUT_LABELS,
+  TEST_THUMB_LABELS,
+  TEST_THUMBS,
+  TEST_TRACK_ID,
+} from "../testing/rangeTestConfig";
+import { getTestThumb, mockTrackBounds, readTestOutput } from "../testing/rangeTestUtils";
 import type { Interval } from "../types";
 import { useRange } from "./useRange";
 
@@ -13,39 +21,42 @@ const RangeTestTrack = ({ bounds, step }: RangeTestTrackProps) => {
     step,
   });
 
+  const outputs = [
+    { label: TEST_OUTPUT_LABELS.selection, value: `${selection.min}-${selection.max}` },
+    { label: TEST_OUTPUT_LABELS.positions, value: `${percents.min}%-${percents.max}%` },
+    { label: TEST_OUTPUT_LABELS.draggingThumb, value: draggingThumb ?? NO_DRAGGING_THUMB },
+  ];
+
   return (
-    <div ref={trackRef} data-testid="track">
-      <button aria-label="Minimum value" {...getThumbProps("min")} />
-      <button aria-label="Maximum value" {...getThumbProps("max")} />
-      <output aria-label="Selection">{`${selection.min}-${selection.max}`}</output>
-      <output aria-label="Positions">{`${percents.min}%-${percents.max}%`}</output>
-      <output aria-label="Dragging thumb">{draggingThumb ?? "none"}</output>
+    <div ref={trackRef} data-testid={TEST_TRACK_ID}>
+      {TEST_THUMBS.map((thumb) => (
+        <button key={thumb} aria-label={TEST_THUMB_LABELS[thumb]} {...getThumbProps(thumb)} />
+      ))}
+      {outputs.map(({ label, value }) => (
+        <output key={label} aria-label={label}>
+          {value}
+        </output>
+      ))}
     </div>
   );
 };
 
-const renderRange = (bounds: Interval, step = 1) => {
-  render(<RangeTestTrack bounds={bounds} step={step} />);
-
-  jest
-    .spyOn(screen.getByTestId("track"), "getBoundingClientRect")
-    .mockReturnValue({ left: 0, width: 200 } as DOMRect);
-
-  const minThumb = screen.getByRole("button", { name: "Minimum value" });
-  const maxThumb = screen.getByRole("button", { name: "Maximum value" });
-
-  const dragThumb = (thumb: HTMLElement, clientX: number) => {
-    fireEvent.pointerDown(thumb, { pointerId: 1 });
-    fireEvent.pointerMove(thumb, { pointerId: 1, clientX });
-    fireEvent.pointerUp(thumb, { pointerId: 1 });
-  };
-
-  return { minThumb, maxThumb, dragThumb };
+const dragThumb = (thumb: HTMLElement, clientX: number) => {
+  fireEvent.pointerDown(thumb, { pointerId: 1 });
+  fireEvent.pointerMove(thumb, { pointerId: 1, clientX });
+  fireEvent.pointerUp(thumb, { pointerId: 1 });
 };
 
-const getSelection = () => screen.getByLabelText("Selection").textContent;
-const getPositions = () => screen.getByLabelText("Positions").textContent;
-const getDraggingThumb = () => screen.getByLabelText("Dragging thumb").textContent;
+const renderRange = (bounds: Interval, step = 1) => {
+  render(<RangeTestTrack bounds={bounds} step={step} />);
+  mockTrackBounds({ left: 0, width: 200 });
+
+  return { minThumb: getTestThumb("min"), maxThumb: getTestThumb("max"), dragThumb };
+};
+
+const getSelection = () => readTestOutput("selection");
+const getPositions = () => readTestOutput("positions");
+const getDraggingThumb = () => readTestOutput("draggingThumb");
 
 describe("Given the useRange hook for a range from 1 to 101 on a track 200px wide", () => {
   const bounds = { min: 1, max: 101 };
