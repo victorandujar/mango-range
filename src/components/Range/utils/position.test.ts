@@ -1,4 +1,10 @@
-import { clampPercent, percentToValue, pointerToPercent, valueToPercent } from "./position";
+import {
+  clampPercent,
+  percentToValue,
+  pointerToPercent,
+  toCssPercent,
+  valueToPercent,
+} from "./position";
 
 describe("Given the clampPercent helper", () => {
   describe.each([
@@ -89,6 +95,14 @@ describe("Given the pointerToPercent converter for a track 200px wide that start
   describe("When the track has not been laid out yet and its width is 0", () => {
     it("Then it should return the start of the track, 0%", () => {
       expect(pointerToPercent(150, { left: 100, width: 0 })).toBe(0);
+    });
+  });
+});
+
+describe("Given the toCssPercent helper", () => {
+  describe("When it receives 37.5", () => {
+    it('Then it should return the CSS percentage "37.5%"', () => {
+      expect(toCssPercent(37.5)).toBe("37.5%");
     });
   });
 });
