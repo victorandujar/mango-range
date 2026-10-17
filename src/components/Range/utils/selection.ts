@@ -1,15 +1,22 @@
 import { clamp } from "@/utils/math";
+import { THUMBS } from "../constants";
 import type { Interval, Thumb } from "../types";
+
+export const getThumbLimits = (thumb: Thumb, selection: Interval, bounds: Interval): Interval =>
+  thumb === THUMBS.min
+    ? { min: bounds.min, max: selection.max }
+    : { min: selection.min, max: bounds.max };
 
 export const constrainThumbValue = (
   thumb: Thumb,
   value: number,
   selection: Interval,
   bounds: Interval,
-): number =>
-  thumb === "min"
-    ? clamp(value, bounds.min, selection.max)
-    : clamp(value, selection.min, bounds.max);
+): number => {
+  const limits = getThumbLimits(thumb, selection, bounds);
+
+  return clamp(value, limits.min, limits.max);
+};
 
 export const updateSelection = (
   selection: Interval,
@@ -20,3 +27,11 @@ export const updateSelection = (
   ...selection,
   [thumb]: constrainThumbValue(thumb, value, selection, bounds),
 });
+
+export const resolveDragThumb = (thumb: Thumb, value: number, selection: Interval): Thumb => {
+  if (selection.min !== selection.max) return thumb;
+  if (value < selection.min) return THUMBS.min;
+  if (value > selection.max) return THUMBS.max;
+
+  return thumb;
+};

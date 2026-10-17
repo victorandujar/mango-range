@@ -1,2 +1,6 @@
-export const isStrictlyAscending = (values: number[]): boolean =>
-  values.every((value, index) => index === 0 || value > (values[index - 1] ?? -Infinity));
+export const isStrictlyAscending = ([current, next, ...rest]: number[]): boolean =>
+  current === undefined ||
+  next === undefined ||
+  (current < next && isStrictlyAscending([next, ...rest]));
+
+export const getLastIndex = (list: readonly unknown[]): number => list.length - 1;

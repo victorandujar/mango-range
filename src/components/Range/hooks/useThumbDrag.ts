@@ -6,10 +6,11 @@ import { pointerToPercent } from "../utils/position";
 
 interface UseThumbDragOptions {
   trackRef: RefObject<HTMLElement | null>;
+  onDragStart: (thumb: Thumb) => void;
   onDrag: (thumb: Thumb, percent: number) => void;
 }
 
-export const useThumbDrag = ({ trackRef, onDrag }: UseThumbDragOptions) => {
+export const useThumbDrag = ({ trackRef, onDragStart, onDrag }: UseThumbDragOptions) => {
   const [draggingThumb, setDraggingThumb] = useState<Thumb | null>(null);
 
   const stopDrag = () => setDraggingThumb(null);
@@ -22,6 +23,7 @@ export const useThumbDrag = ({ trackRef, onDrag }: UseThumbDragOptions) => {
       event.currentTarget.setPointerCapture(event.pointerId);
       event.currentTarget.focus();
       setDraggingThumb(thumb);
+      onDragStart(thumb);
     },
     onPointerMove: (event: PointerEvent<HTMLElement>) => {
       if (draggingThumb !== thumb || !trackRef.current) return;

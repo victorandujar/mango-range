@@ -1,7 +1,26 @@
-import { constrainThumbValue, updateSelection } from "./selection";
+import {
+  constrainThumbValue,
+  getThumbLimits,
+  resolveDragThumb,
+  updateSelection,
+} from "./selection";
 
 const bounds = { min: 1, max: 100 };
 const selection = { min: 20, max: 80 };
+
+describe("Given a range from 1 to 100 with a selection from 20 to 80, when the limits of each thumb are requested", () => {
+  describe("When the limits of the min thumb are requested", () => {
+    it("Then they should go from the lower bound, 1, to the max thumb value, 80", () => {
+      expect(getThumbLimits("min", selection, bounds)).toEqual({ min: 1, max: 80 });
+    });
+  });
+
+  describe("When the limits of the max thumb are requested", () => {
+    it("Then they should go from the min thumb value, 20, to the upper bound, 100", () => {
+      expect(getThumbLimits("max", selection, bounds)).toEqual({ min: 20, max: 100 });
+    });
+  });
+});
 
 describe("Given a range from 1 to 100 with a selection from 20 to 80", () => {
   describe("When the min thumb is moved to 50, between the lower bound and the max thumb", () => {
@@ -138,4 +157,41 @@ describe("Given a fixed range of six values handled by their indexes, from 0 to 
       expect(updateSelection(indexSelection, "min", -1, indexBounds)).toEqual({ min: 0, max: 4 });
     });
   });
+});
+
+describe("Given a selection from 20 to 80, where the thumbs are apart", () => {
+  describe.each(["min", "max"] as const)("When the %s thumb is dragged to any value", (thumb) => {
+    it(`Then the ${thumb} thumb should be the one that moves`, () => {
+      expect(resolveDragThumb(thumb, 50, selection)).toBe(thumb);
+      expect(resolveDragThumb(thumb, 5, selection)).toBe(thumb);
+    });
+  });
+});
+
+describe("Given a selection where both thumbs are collapsed at 20", () => {
+  const collapsedSelection = { min: 20, max: 20 };
+
+  describe.each(["min", "max"] as const)(
+    "When the %s thumb is dragged backward, to 10",
+    (thumb) => {
+      it("Then the min thumb should be the one that moves, so the selection can grow", () => {
+        expect(resolveDragThumb(thumb, 10, collapsedSelection)).toBe("min");
+      });
+    },
+  );
+
+  describe.each(["min", "max"] as const)("When the %s thumb is dragged forward, to 30", (thumb) => {
+    it("Then the max thumb should be the one that moves, so the selection can grow", () => {
+      expect(resolveDragThumb(thumb, 30, collapsedSelection)).toBe("max");
+    });
+  });
+
+  describe.each(["min", "max"] as const)(
+    "When the %s thumb is dragged without leaving the collapsed value",
+    (thumb) => {
+      it(`Then the ${thumb} thumb should remain the one being dragged`, () => {
+        expect(resolveDragThumb(thumb, 20, collapsedSelection)).toBe(thumb);
+      });
+    },
+  );
 });

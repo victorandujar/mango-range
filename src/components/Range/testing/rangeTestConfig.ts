@@ -13,6 +13,7 @@ export const TEST_OUTPUT_LABELS = {
   selection: "Selection",
   positions: "Positions",
   draggingThumb: "Dragging thumb",
+  topThumb: "Top thumb",
 } as const;
 
 export const NO_DRAGGING_THUMB = "none";

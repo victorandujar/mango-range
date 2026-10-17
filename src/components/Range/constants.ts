@@ -1,15 +1,31 @@
+export const THUMBS = {
+  min: "min",
+  max: "max",
+} as const;
+
+export const DEFAULT_TOP_THUMB = THUMBS.max;
+
 export const PERCENT_LIMITS = {
   min: 0,
   max: 100,
 } as const;
 
+export const EMPTY_TRACK_WIDTH = 0;
+
+export const PRIMARY_POINTER_BUTTON = 0;
+
+export const KEYBOARD_STEPS = {
+  single: 1,
+  page: 10,
+} as const;
+
 export const KEYBOARD_STEP_MULTIPLIERS: ReadonlyMap<string, number> = new Map([
-  ["ArrowLeft", -1],
-  ["ArrowDown", -1],
-  ["ArrowRight", 1],
-  ["ArrowUp", 1],
-  ["PageDown", -10],
-  ["PageUp", 10],
+  ["ArrowLeft", -KEYBOARD_STEPS.single],
+  ["ArrowDown", -KEYBOARD_STEPS.single],
+  ["ArrowRight", KEYBOARD_STEPS.single],
+  ["ArrowUp", KEYBOARD_STEPS.single],
+  ["PageDown", -KEYBOARD_STEPS.page],
+  ["PageUp", KEYBOARD_STEPS.page],
 ]);
 
 export const KEYBOARD_BOUNDARY_KEYS = {
@@ -17,4 +33,10 @@ export const KEYBOARD_BOUNDARY_KEYS = {
   end: "End",
 } as const;
 
-export const PRIMARY_POINTER_BUTTON = 0;
+export const DEFAULT_STEP = 1;
+
+export const FIXED_RANGE_STEP = 1;
+
+export const RANGE_ERROR_MESSAGES = {
+  positionOutOfValues: "The range position does not match any of the fixed values",
+} as const;
