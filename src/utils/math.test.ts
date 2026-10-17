@@ -31,15 +31,15 @@ describe("Given the roundToStep helper", () => {
     [12.4, 12],
     [12.5, 13],
     [12.6, 13],
-  ])("When it receives %p with a step of 1", (value, expected) => {
+  ])("When it receives %p with a step of 1 starting from the origin 0", (value, expected) => {
     it(`Then it should round it to the closest step, ${expected}`, () => {
-      expect(roundToStep(value, 1)).toBe(expected);
+      expect(roundToStep(value, 1, 0)).toBe(expected);
     });
   });
 
-  describe("When it receives 23 with a step of 5", () => {
+  describe("When it receives 23 with a step of 5 starting from the origin 0", () => {
     it("Then it should round it to the closest multiple of 5, 25", () => {
-      expect(roundToStep(23, 5)).toBe(25);
+      expect(roundToStep(23, 5, 0)).toBe(25);
     });
   });
 
@@ -49,9 +49,9 @@ describe("Given the roundToStep helper", () => {
     });
   });
 
-  describe("When it receives 1.3 with a step of 0.5", () => {
+  describe("When it receives 1.3 with a step of 0.5 starting from the origin 0", () => {
     it("Then it should round it to the closest half, 1.5", () => {
-      expect(roundToStep(1.3, 0.5)).toBe(1.5);
+      expect(roundToStep(1.3, 0.5, 0)).toBe(1.5);
     });
   });
 });
