@@ -9,7 +9,12 @@ const config = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/e2e/"],
-  collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.d.ts", "!src/app/layout.tsx"],
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/app/layout.tsx",
+    "!src/**/testing/**",
+  ],
 };
 
 export default createJestConfig(config);
