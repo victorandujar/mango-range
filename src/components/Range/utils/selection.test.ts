@@ -1,7 +1,21 @@
-import { constrainThumbValue, updateSelection } from "./selection";
+import { constrainThumbValue, getThumbLimits, updateSelection } from "./selection";
 
 const bounds = { min: 1, max: 100 };
 const selection = { min: 20, max: 80 };
+
+describe("Given a range from 1 to 100 with a selection from 20 to 80, when the limits of each thumb are requested", () => {
+  describe("When the limits of the min thumb are requested", () => {
+    it("Then they should go from the lower bound, 1, to the max thumb value, 80", () => {
+      expect(getThumbLimits("min", selection, bounds)).toEqual({ min: 1, max: 80 });
+    });
+  });
+
+  describe("When the limits of the max thumb are requested", () => {
+    it("Then they should go from the min thumb value, 20, to the upper bound, 100", () => {
+      expect(getThumbLimits("max", selection, bounds)).toEqual({ min: 20, max: 100 });
+    });
+  });
+});
 
 describe("Given a range from 1 to 100 with a selection from 20 to 80", () => {
   describe("When the min thumb is moved to 50, between the lower bound and the max thumb", () => {
