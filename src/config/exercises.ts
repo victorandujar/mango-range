@@ -17,3 +17,5 @@ export const EXERCISES = {
 } as const;
 
 export const EXERCISE_LIST = [EXERCISES.normal, EXERCISES.fixed] as const;
+
+export type Exercise = (typeof EXERCISE_LIST)[number];
