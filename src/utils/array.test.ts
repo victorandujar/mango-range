@@ -1,11 +1,22 @@
 import { isStrictlyAscending } from "./array";
 
-describe("isStrictlyAscending", () => {
-  it.each([[[]], [[1]], [[1, 2, 3]], [[-5, 0, 1.99, 70.99]]])("returns true for %p", (values) => {
-    expect(isStrictlyAscending(values)).toBe(true);
-  });
+describe("Given the isStrictlyAscending helper", () => {
+  describe.each([[[]], [[1]], [[1, 2, 3]], [[-5, 0, 1.99, 70.99]]])(
+    "When it receives %p, where every value is greater than the previous one",
+    (values) => {
+      it("Then it should consider the list strictly ascending", () => {
+        expect(isStrictlyAscending(values)).toBe(true);
+      });
+    },
+  );
 
-  it.each([[[2, 1]], [[1, 1, 2]], [[1, 3, 2]]])("returns false for %p", (values) => {
-    expect(isStrictlyAscending(values)).toBe(false);
+  describe.each([
+    ["descending values", [2, 1]],
+    ["repeated values", [1, 1, 2]],
+    ["a value lower than the previous one", [1, 3, 2]],
+  ])("When it receives a list with %s", (_, values) => {
+    it("Then it should not consider the list strictly ascending", () => {
+      expect(isStrictlyAscending(values)).toBe(false);
+    });
   });
 });
