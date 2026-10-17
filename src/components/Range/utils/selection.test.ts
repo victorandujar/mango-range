@@ -58,3 +58,84 @@ describe("Given a range from 1 to 100 with a selection from 20 to 80", () => {
     });
   });
 });
+
+describe("Given a range from 1 to 100 with a selection from 20 to 80, when a thumb lands exactly on the other one", () => {
+  describe("When the min thumb is moved to 80, the value of the max thumb", () => {
+    it("Then the min thumb should take the value 80, so both thumbs can meet", () => {
+      expect(constrainThumbValue("min", 80, selection, bounds)).toBe(80);
+    });
+  });
+
+  describe("When the max thumb is moved to 20, the value of the min thumb", () => {
+    it("Then the max thumb should take the value 20, so both thumbs can meet", () => {
+      expect(constrainThumbValue("max", 20, selection, bounds)).toBe(20);
+    });
+  });
+});
+
+describe("Given a range from 1 to 100 with both thumbs collapsed at 20", () => {
+  const collapsedSelection = { min: 20, max: 20 };
+
+  describe("When the min thumb is moved forward, to 30", () => {
+    it("Then the min thumb should stay at 20, blocked by the max thumb", () => {
+      expect(updateSelection(collapsedSelection, "min", 30, bounds)).toEqual({ min: 20, max: 20 });
+    });
+  });
+
+  describe("When the min thumb is moved backward, to 10", () => {
+    it("Then the min thumb should move freely and the selection should go from 10 to 20", () => {
+      expect(updateSelection(collapsedSelection, "min", 10, bounds)).toEqual({ min: 10, max: 20 });
+    });
+  });
+
+  describe("When the max thumb is moved backward, to 10", () => {
+    it("Then the max thumb should stay at 20, blocked by the min thumb", () => {
+      expect(updateSelection(collapsedSelection, "max", 10, bounds)).toEqual({ min: 20, max: 20 });
+    });
+  });
+
+  describe("When the max thumb is moved forward, to 30", () => {
+    it("Then the max thumb should move freely and the selection should go from 20 to 30", () => {
+      expect(updateSelection(collapsedSelection, "max", 30, bounds)).toEqual({ min: 20, max: 30 });
+    });
+  });
+});
+
+describe("Given a range from 1 to 100 with the whole range selected", () => {
+  const fullSelection = { min: 1, max: 100 };
+
+  describe("When the min thumb is pushed below the lower bound, to 0", () => {
+    it("Then the selection should remain from 1 to 100", () => {
+      expect(updateSelection(fullSelection, "min", 0, bounds)).toEqual(fullSelection);
+    });
+  });
+
+  describe("When the max thumb is pushed above the upper bound, to 101", () => {
+    it("Then the selection should remain from 1 to 100", () => {
+      expect(updateSelection(fullSelection, "max", 101, bounds)).toEqual(fullSelection);
+    });
+  });
+});
+
+describe("Given a fixed range of six values handled by their indexes, from 0 to 5, with a selection from index 1 to 4", () => {
+  const indexBounds = { min: 0, max: 5 };
+  const indexSelection = { min: 1, max: 4 };
+
+  describe("When the min thumb is moved to the last index, 5", () => {
+    it("Then the min thumb should stop at the index of the max thumb, 4", () => {
+      expect(updateSelection(indexSelection, "min", 5, indexBounds)).toEqual({ min: 4, max: 4 });
+    });
+  });
+
+  describe("When the max thumb is moved beyond the last index, to 6", () => {
+    it("Then the max thumb should stop at the last index, 5", () => {
+      expect(updateSelection(indexSelection, "max", 6, indexBounds)).toEqual({ min: 1, max: 5 });
+    });
+  });
+
+  describe("When the min thumb is moved before the first index, to -1", () => {
+    it("Then the min thumb should stop at the first index, 0", () => {
+      expect(updateSelection(indexSelection, "min", -1, indexBounds)).toEqual({ min: 0, max: 4 });
+    });
+  });
+});
