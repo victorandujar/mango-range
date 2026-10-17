@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
-import { fixedRangeMock } from "@/mocks/range";
+import { getFixedRange } from "@/services/rangeService";
 
-export function GET() {
-  return NextResponse.json(fixedRangeMock);
+export async function GET() {
+  try {
+    return NextResponse.json(await getFixedRange());
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unexpected error";
+
+    return NextResponse.json({ message }, { status: 500 });
+  }
 }
