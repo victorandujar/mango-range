@@ -32,3 +32,11 @@ export const KEYBOARD_BOUNDARY_KEYS = {
   start: "Home",
   end: "End",
 } as const;
+
+export const DEFAULT_STEP = 1;
+
+export const FIXED_RANGE_STEP = 1;
+
+export const RANGE_ERROR_MESSAGES = {
+  positionOutOfValues: "The range position does not match any of the fixed values",
+} as const;
