@@ -1,28 +1,13 @@
 import { fixedRangeMock, normalRangeMock } from "@/mocks/range";
-import {
-  getFixedRange,
-  getNormalRange,
-  isFixedRangeData,
-  isNormalRangeData,
-  rangeEndpoints,
-} from "./rangeService";
+import { getFixedRange, getNormalRange, isFixedRangeData, isNormalRangeData } from "./rangeService";
 
-const fetchMock = jest.fn();
+jest.mock("@/mocks/range", () => ({
+  normalRangeMock: { min: 1, max: 100 },
+  fixedRangeMock: { rangeValues: [1.99, 5.99, 10.99, 30.99, 50.99, 70.99] },
+}));
 
-const mockResponse = (body: unknown, status = 200) => {
-  fetchMock.mockResolvedValueOnce({
-    ok: status >= 200 && status < 300,
-    status,
-    json: () => Promise.resolve(body),
-  });
-};
-
-beforeAll(() => {
-  global.fetch = fetchMock;
-});
-
-beforeEach(() => {
-  fetchMock.mockReset();
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 describe("isNormalRangeData", () => {
@@ -63,58 +48,27 @@ describe("isFixedRangeData", () => {
 });
 
 describe("getNormalRange", () => {
-  it("requests the normal range endpoint and returns its data", async () => {
-    mockResponse(normalRangeMock);
-
-    await expect(getNormalRange()).resolves.toEqual(normalRangeMock);
-    expect(fetchMock).toHaveBeenCalledWith(rangeEndpoints.normal, { signal: undefined });
+  it("resolves with the normal range data", async () => {
+    await expect(getNormalRange()).resolves.toEqual({ min: 1, max: 100 });
   });
 
-  it("forwards the abort signal to fetch", async () => {
-    const controller = new AbortController();
-    mockResponse(normalRangeMock);
+  it("rejects when the source data is invalid", async () => {
+    jest.replaceProperty(normalRangeMock, "min", 100);
 
-    await getNormalRange(controller.signal);
-
-    expect(fetchMock).toHaveBeenCalledWith(rangeEndpoints.normal, { signal: controller.signal });
-  });
-
-  it("throws when the response is not successful", async () => {
-    mockResponse({ message: "Internal error" }, 500);
-
-    await expect(getNormalRange()).rejects.toThrow("failed with status 500");
-  });
-
-  it("throws when the response has an unexpected format", async () => {
-    mockResponse({ min: 100, max: 1 });
-
-    await expect(getNormalRange()).rejects.toThrow("Unexpected response format");
-  });
-
-  it("propagates network errors", async () => {
-    fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
-
-    await expect(getNormalRange()).rejects.toThrow("Failed to fetch");
+    await expect(getNormalRange()).rejects.toThrow("Invalid normal range data");
   });
 });
 
 describe("getFixedRange", () => {
-  it("requests the fixed range endpoint and returns its data", async () => {
-    mockResponse(fixedRangeMock);
-
-    await expect(getFixedRange()).resolves.toEqual(fixedRangeMock);
-    expect(fetchMock).toHaveBeenCalledWith(rangeEndpoints.fixed, { signal: undefined });
+  it("resolves with the fixed range values", async () => {
+    await expect(getFixedRange()).resolves.toEqual({
+      rangeValues: [1.99, 5.99, 10.99, 30.99, 50.99, 70.99],
+    });
   });
 
-  it("throws when the response is not successful", async () => {
-    mockResponse(null, 404);
+  it("rejects when the source data is invalid", async () => {
+    jest.replaceProperty(fixedRangeMock, "rangeValues", [5.99, 1.99]);
 
-    await expect(getFixedRange()).rejects.toThrow("failed with status 404");
-  });
-
-  it("throws when the response has an unexpected format", async () => {
-    mockResponse({ rangeValues: [] });
-
-    await expect(getFixedRange()).rejects.toThrow("Unexpected response format");
+    await expect(getFixedRange()).rejects.toThrow("Invalid fixed range data");
   });
 });
