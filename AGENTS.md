@@ -61,8 +61,18 @@ any step is blocked, report the blocker explicitly instead.
 - Apply SOLID, KISS, DRY and YAGNI. Prefer the simplest solution that solves the current
   requirement; do not add code, options or abstractions that nothing uses yet.
 - Each file has a single responsibility. Split a file when it starts doing more than one thing.
-- No magic numbers or strings inside logic. Constants and configuration live in dedicated files as
-  `as const` objects with descriptive names (`ERROR_MESSAGES`, `HTTP_STATUS`, `RANGE_CONSTRAINTS`...).
+- No magic numbers or magic strings anywhere: logic, components, pages, layouts or route handlers.
+  Every value with a meaning lives in a constants or config file and is referenced by name:
+  - Constants (`constants.ts`, `src/constants/`): fixed values such as limits, steps, keys, status
+    codes, messages, accessible labels and UI texts, as `as const` objects with descriptive names
+    (`ERROR_MESSAGES`, `HTTP_STATUS`, `RANGE_CONSTRAINTS`, `THUMBS`...).
+  - Config (`config.ts`, `src/config/`): values that set up the application or a feature, such as
+    site metadata, routes, navigation items or formatting options.
+  - Repeated elements (thumbs, labels, links, outputs...) are declared once as arrays or objects in
+    those files and rendered with `map`.
+  - Only language syntax is exempt: TypeScript types, `typeof` checks and Tailwind classes.
+  - Tests may use literal values as scenario data. Labels, ids and texts shared between tests go to
+    a test config file inside a `testing/` folder.
 - Modules start with their imports and their main code. Do not declare lists of constants or helper
   functions at the top of services, routes or components; move them to constants, utils or
   validators files.
@@ -78,6 +88,7 @@ any step is blocked, report the blocker explicitly instead.
 src/
 ├── app/            Routes, layouts and route handlers (app/api)
 ├── components/     UI components, one folder per component
+├── config/         Application configuration (site metadata, routes, formatting)
 ├── constants/      Global constants (messages, HTTP status, constraints)
 ├── lib/            Framework-specific helpers (e.g. lib/api for route handlers)
 ├── mocks/          Mocked data sources
@@ -95,6 +106,7 @@ components/Range/
 ├── components/     Subcomponents used only by Range
 ├── hooks/          State and behaviour (custom hooks)
 ├── constants.ts    Constants scoped to the component
+├── testing/        Test config and helpers shared by the component tests
 ├── types.ts        Types scoped to the component
 └── utils/          Pure helpers scoped to the component
 ```
