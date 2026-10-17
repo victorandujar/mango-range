@@ -16,3 +16,5 @@ export const KEYBOARD_BOUNDARY_KEYS = {
   start: "Home",
   end: "End",
 } as const;
+
+export const PRIMARY_POINTER_BUTTON = 0;
