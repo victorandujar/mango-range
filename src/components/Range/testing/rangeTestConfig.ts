@@ -17,3 +17,15 @@ export const TEST_OUTPUT_LABELS = {
 } as const;
 
 export const NO_DRAGGING_THUMB = "none";
+
+export const TEST_EDIT_LABELS = {
+  button: "Edit value",
+  input: "Value",
+} as const;
+
+export const TEST_FIXED_VALUES = [1.99, 5.99, 10.99, 30.99, 50.99, 70.99];
+
+export const TEST_EURO_FORMAT = {
+  locale: "en-US",
+  options: { style: "currency", currency: "EUR", minimumFractionDigits: 0 },
+} as const;

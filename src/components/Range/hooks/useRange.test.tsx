@@ -230,6 +230,20 @@ describe("Given the useRange hook for a range from 1 to 101 where the thumbs ove
     });
   });
 
+  describe("When the max thumb is dragged against the min thumb at 51 and the pointer keeps moving backward in the same drag", () => {
+    it("Then the max thumb should stop at the min thumb and the min thumb should not move", () => {
+      const { minThumb, maxThumb, dragThumb } = renderRange(bounds);
+
+      dragThumb(minThumb, 100);
+      fireEvent.pointerDown(maxThumb, { pointerId: 1 });
+      fireEvent.pointerMove(maxThumb, { pointerId: 1, clientX: 100 });
+      fireEvent.pointerMove(maxThumb, { pointerId: 1, clientX: 40 });
+      fireEvent.pointerMove(maxThumb, { pointerId: 1, clientX: 10 });
+
+      expect(getSelection()).toBe("51-51");
+    });
+  });
+
   describe("When both thumbs are collapsed at 51 and the min thumb is dragged forward, to 160px", () => {
     it("Then the max thumb should move with the pointer, ending at 81", () => {
       const { minThumb, maxThumb, dragThumb } = renderRange(bounds);

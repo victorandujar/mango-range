@@ -1,5 +1,5 @@
 import { clamp } from "@/utils/math";
-import { EMPTY_TRACK_WIDTH, PERCENT_LIMITS } from "../constants";
+import { CSS_PERCENT_UNIT, EMPTY_TRACK_WIDTH, PERCENT_LIMITS } from "../constants";
 
 type TrackBounds = Pick<DOMRect, "left" | "width">;
 
@@ -17,3 +17,5 @@ export const pointerToPercent = (clientX: number, { left, width }: TrackBounds):
 
   return clampPercent(((clientX - left) / width) * PERCENT_LIMITS.max);
 };
+
+export const toCssPercent = (percent: number): string => `${percent}${CSS_PERCENT_UNIT}`;

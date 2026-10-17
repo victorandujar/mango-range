@@ -40,3 +40,32 @@ export const FIXED_RANGE_STEP = 1;
 export const RANGE_ERROR_MESSAGES = {
   positionOutOfValues: "The range position does not match any of the fixed values",
 } as const;
+
+export const EDIT_KEYS = {
+  commit: "Enter",
+  cancel: "Escape",
+} as const;
+
+export const CSS_PERCENT_UNIT = "%";
+
+export const RANGE_ACCESSIBLE_LABELS = {
+  thumbs: {
+    min: "Minimum value",
+    max: "Maximum value",
+  },
+  editButtons: {
+    min: "Edit minimum value",
+    max: "Edit maximum value",
+  },
+  inputs: {
+    min: "Minimum value input",
+    max: "Maximum value input",
+  },
+} as const;
+
+export const LABEL_ALIGNMENT_CLASSES = {
+  min: "text-right",
+  max: "text-left",
+} as const;
+
+export const RANGE_THUMBS = [THUMBS.min, THUMBS.max] as const;
