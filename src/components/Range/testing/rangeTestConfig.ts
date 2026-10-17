@@ -17,3 +17,8 @@ export const TEST_OUTPUT_LABELS = {
 } as const;
 
 export const NO_DRAGGING_THUMB = "none";
+
+export const TEST_EDIT_LABELS = {
+  button: "Edit value",
+  input: "Value",
+} as const;

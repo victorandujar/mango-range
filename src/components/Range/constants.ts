@@ -40,3 +40,8 @@ export const FIXED_RANGE_STEP = 1;
 export const RANGE_ERROR_MESSAGES = {
   positionOutOfValues: "The range position does not match any of the fixed values",
 } as const;
+
+export const EDIT_KEYS = {
+  commit: "Enter",
+  cancel: "Escape",
+} as const;
